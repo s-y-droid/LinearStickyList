@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "stickyheader"
 include(":app")
+include(":libstickyheader")
