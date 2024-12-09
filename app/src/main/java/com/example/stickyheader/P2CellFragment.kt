@@ -4,22 +4,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.stickyheader.databinding.P2FragmentBinding
+import com.example.stickyheader.databinding.P2CellFragmentBinding
 
-class P2Fragment : PnNormalFragmentBase() {
+class P2CellFragment : PnCellFragmentBase() {
 
     companion object {
-        fun newInstance() = P2Fragment()
+        fun newInstance() = P2CellFragment()
     }
 
-    private lateinit var binding: P2FragmentBinding
+    private lateinit var binding: P2CellFragmentBinding
+
+    override fun isStickyHeader() = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = P2FragmentBinding.inflate(inflater, container, false)
+        binding = P2CellFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 

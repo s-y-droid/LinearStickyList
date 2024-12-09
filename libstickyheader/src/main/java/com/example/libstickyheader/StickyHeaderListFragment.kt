@@ -6,60 +6,74 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
-import com.example.libstickyheader.databinding.StickyHeaderFragmentBinding
+import com.example.libstickyheader.databinding.StickyHeaderListFragmentBinding
 import com.example.libstickyheader.impl.CustomFrameLayout
 
-class StickyHeaderFragment : Fragment() {
+class StickyHeaderListFragment : Fragment() {
 
-    private lateinit var binding: StickyHeaderFragmentBinding
+    private lateinit var binding: StickyHeaderListFragmentBinding
     private val itemList = mutableListOf<StickyItem>()
     private var originalScrollY: Int = 0
     private var isBind = false
     private var isViewCreated = false
-    private var bindStock: List<IStickyHeaderViewParts>? = null
+    private var bindStock: List<IStickyHeaderListCell>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = StickyHeaderFragmentBinding.inflate(inflater, container, false)
+        binding = StickyHeaderListFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     private inner class StickyItem {
         lateinit var listPartsParent: CustomFrameLayout
-        lateinit var listPartsContainer: FragmentContainerView
-        lateinit var listPartsView: IStickyHeaderViewParts
+        var listPartsContainer: FragmentContainerView? = null
+        var listPartsView: IStickyHeaderListCell? = null
         var stickyPartsParent: CustomFrameLayout? = null
         var stickyPartsContainer: FragmentContainerView? = null
-        var stickyPartsView: IStickyHeaderViewParts? = null
+        var stickyPartsView: IStickyHeaderListCell? = null
 
-        fun set(original: IStickyHeaderViewParts): StickyItem {
-            listPartsView = original
-            val orgContainer = makeContainer()
-            listPartsContainer = orgContainer
-            listPartsParent =
-                CustomFrameLayout(requireContext()).also { it.setOnLayoutCallback(::moveStickyArea) }
-            listPartsParent.addView(orgContainer)
-            binding.list.addView(listPartsParent)
-            addFragmentToContainer(orgContainer, original.fragment())
+        fun set(original: IStickyHeaderListCell): StickyItem {
+            val isStickyHeader = original.isStickyHeader()
 
-            if (original.isStickyHeader()) {
-                val stickyContainer = makeContainer()
-                orgContainer.visibility = View.INVISIBLE
-                stickyPartsContainer = stickyContainer
+            if (isStickyHeader) {
+                listPartsParent =
+                    CustomFrameLayout(requireContext()).also {
+                        it.setOnLayoutCallback(::moveStickyArea)
+                    }
+                binding.list.addView(listPartsParent)
+
                 stickyPartsParent =
-                    CustomFrameLayout(requireContext()).also { it.setOnLayoutCallback(::moveStickyArea) }
-                stickyPartsParent!!.addView(stickyContainer)
+                    CustomFrameLayout(requireContext()).also { fr ->
+                        fr.setOnLayoutCallback {
+                            listPartsParent.layoutParams.let {
+                                it.height = fr.bottom - fr.top
+                                listPartsParent.layoutParams = it
+                            }
+                        }
+                    }
+                stickyPartsContainer = makeContainer()
+                stickyPartsParent!!.addView(stickyPartsContainer)
                 binding.stickyArea.addView(stickyPartsParent)
-                original.makeStickyInstance().also {
-                    stickyPartsView = it
-                    addFragmentToContainer(stickyContainer, it.fragment())
-                }
+                stickyPartsView = original
+                addFragmentToContainer(stickyPartsContainer!!, original.fragment())
+                //listPartsView = null
+            } else {
+                listPartsView = original
+                val orgContainer = makeContainer()
+                listPartsContainer = orgContainer
+                listPartsParent =
+                    CustomFrameLayout(requireContext()).also { it.setOnLayoutCallback(::moveStickyArea) }
+                listPartsParent.addView(orgContainer)
+                binding.list.addView(listPartsParent)
+                addFragmentToContainer(orgContainer, original.fragment())
             }
             return this
         }
+
+        fun isStickyHeader() = listPartsView == null
 
         private fun makeContainer(): FragmentContainerView {
             val container = FragmentContainerView(requireContext())
@@ -74,7 +88,7 @@ class StickyHeaderFragment : Fragment() {
         private fun addFragmentToContainer(container: FragmentContainerView, fragment: Fragment) {
             val transaction = childFragmentManager.beginTransaction()
             transaction.replace(container.id, fragment)
-            transaction.commitNow()
+            transaction.commit()
         }
     }
 
@@ -87,7 +101,7 @@ class StickyHeaderFragment : Fragment() {
         }
     }
 
-    fun bind(list: List<IStickyHeaderViewParts>) {
+    fun bind(list: List<IStickyHeaderListCell>) {
         if (isViewCreated) {
             itemList.clear()
             list.forEach { stickyHeaderItem ->
@@ -122,14 +136,15 @@ class StickyHeaderFragment : Fragment() {
                 orgFragment = item.listPartsParent
                 stickyFragment = item.stickyPartsParent!!
                 orgY = (orgFragment.top - originalScrollY).toFloat()
-                itemHeight = (orgFragment.bottom - orgFragment.top).toFloat()
+                itemHeight =
+                    stickyFragment.height.toFloat()//(stickyFragment.bottom - stickyFragment.top).toFloat()
                 state = State.FREE
             }
         }
 
         val infoList = mutableListOf<PerStickyItemInfo>()
         itemList.forEach {
-            if (it.listPartsView.isStickyHeader()) {
+            if (it.isStickyHeader()) {
                 infoList.add(PerStickyItemInfo(it))
             }
         }

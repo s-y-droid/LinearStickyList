@@ -1,11 +1,19 @@
 package com.example.libstickyheader.impl
 
 import android.content.Context
+import android.view.ViewGroup
 import android.widget.FrameLayout
 
 class CustomFrameLayout(context: Context) : FrameLayout(context) {
 
     private var listener: (() -> Unit)? = null
+
+    init {
+        layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+        )
+    }
 
     fun setOnLayoutCallback(cb: (() -> Unit)?) {
         listener = cb

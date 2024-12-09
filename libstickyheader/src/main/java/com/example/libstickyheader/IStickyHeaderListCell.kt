@@ -2,8 +2,7 @@ package com.example.libstickyheader
 
 import androidx.fragment.app.Fragment
 
-interface IStickyHeaderViewParts {
+interface IStickyHeaderListCell {
     fun isStickyHeader(): Boolean
-    fun makeStickyInstance(): IStickyHeaderViewParts
     fun fragment() : Fragment
 }

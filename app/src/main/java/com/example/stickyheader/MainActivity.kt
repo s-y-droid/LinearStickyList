@@ -3,7 +3,7 @@ package com.example.stickyheader
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.libstickyheader.StickyHeaderFragment
+import com.example.libstickyheader.StickyHeaderListFragment
 import com.example.stickyheader.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -18,18 +18,18 @@ class MainActivity : AppCompatActivity() {
         getStickyHeaderFragment().bind(
             // Note: Specify here a list of all the Fragments that make up the screen.
             listOf(
-                P1Fragment.newInstance(),
-                P2Fragment.newInstance(),
-                P3Fragment.newInstance(),
-                P4Fragment.newInstance(),
-                P1Fragment.newInstance(),
-                P2Fragment.newInstance(),
-                P3Fragment.newInstance(),
-                P4Fragment.newInstance(),
-                P1Fragment.newInstance(),
-                P2Fragment.newInstance(),
-                P3Fragment.newInstance(),
-                P4Fragment.newInstance(),
+                P1CellFragment.newInstance(),
+                P2CellFragment.newInstance(),
+                P3CellFragment.newInstance(),
+                P4CellFragment.newInstance(),
+                P1CellFragment.newInstance(),
+                P2CellFragment.newInstance(),
+                P3CellFragment.newInstance(),
+                P4CellFragment.newInstance(),
+                P1CellFragment.newInstance(),
+                P2CellFragment.newInstance(),
+                P3CellFragment.newInstance(),
+                P4CellFragment.newInstance(),
             )
         )
 
@@ -39,5 +39,5 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getStickyHeaderFragment() =
-        binding.stickyHeaderFragment.getFragment<StickyHeaderFragment>()
+        binding.stickyHeaderFragment.getFragment<StickyHeaderListFragment>()
 }
