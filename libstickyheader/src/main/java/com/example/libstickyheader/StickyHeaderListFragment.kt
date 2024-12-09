@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import com.example.libstickyheader.databinding.StickyHeaderListFragmentBinding
@@ -17,6 +18,8 @@ class StickyHeaderListFragment : Fragment() {
     private var isBind = false
     private var isViewCreated = false
     private var bindStock: List<IStickyHeaderListCell>? = null
+    private var scrollbarOptions: IScrollBarOptions? = null
+    private var scrollbarHeight: Float = 0f
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,7 +62,7 @@ class StickyHeaderListFragment : Fragment() {
                 binding.stickyArea.addView(stickyPartsParent)
                 stickyPartsView = original
                 addFragmentToContainer(stickyPartsContainer!!, original.fragment())
-                //listPartsView = null
+
             } else {
                 listPartsView = original
                 val orgContainer = makeContainer()
@@ -101,7 +104,15 @@ class StickyHeaderListFragment : Fragment() {
         }
     }
 
-    fun bind(list: List<IStickyHeaderListCell>) {
+    class DefaultScrollbarOptions : IScrollBarOptions
+
+    fun bind(
+        list: List<IStickyHeaderListCell>,
+        scrollbarOptions: IScrollBarOptions? = null,
+        onCompleteBinding: ((scrollView: ScrollView) -> Unit)? = null
+    ) {
+        this.scrollbarOptions = scrollbarOptions ?: DefaultScrollbarOptions()
+
         if (isViewCreated) {
             itemList.clear()
             list.forEach { stickyHeaderItem ->
@@ -111,9 +122,12 @@ class StickyHeaderListFragment : Fragment() {
                 originalScrollY = y
                 moveStickyArea()
             }
+
             binding.scrollview.post {
                 isBind = true
+                setupScrollbar()
                 moveStickyArea()
+                onCompleteBinding?.invoke(binding.scrollview)
             }
         } else {
             bindStock = list
@@ -137,7 +151,7 @@ class StickyHeaderListFragment : Fragment() {
                 stickyFragment = item.stickyPartsParent!!
                 orgY = (orgFragment.top - originalScrollY).toFloat()
                 itemHeight =
-                    stickyFragment.height.toFloat()//(stickyFragment.bottom - stickyFragment.top).toFloat()
+                    stickyFragment.height.toFloat()
                 state = State.FREE
             }
         }
@@ -180,6 +194,51 @@ class StickyHeaderListFragment : Fragment() {
                 }
             }
         }
+        moveScrollBar()
+    }
+
+    private fun setupScrollbar() {
+        val listHeight = binding.list.height.toFloat()
+        val screenHeight = binding.stickyArea.height.toFloat()
+
+        scrollbarOptions?.let { options ->
+            if (!options.isShowScrollbar() || listHeight <= screenHeight) {
+                binding.scrollbarArea.visibility = View.GONE
+
+            } else {
+                fun dpToPx(dp: Float) =
+                    (requireContext().resources.displayMetrics.density * dp).toInt()
+
+                binding.scrollbarArea.let { sbArea ->
+                    sbArea.setBackgroundResource(scrollbarOptions!!.drawableResId())
+                    sbArea.layoutParams.let {
+                        it.width = dpToPx(options.widthDp())
+                        scrollbarHeight =
+                            (screenHeight * screenHeight) / listHeight
+                        it.height = scrollbarHeight.toInt()
+                        sbArea.layoutParams = it
+                    }
+                }
+                moveScrollBar()
+                binding.scrollbarArea.visibility = View.VISIBLE
+            }
+        } ?: run { binding.scrollbarArea.visibility = View.GONE }
+    }
+
+    private fun moveScrollBar() {
+        val listHeight = binding.list.height.toFloat()
+        val screenHeight = binding.stickyArea.height.toFloat()
+
+        val newScrollBarHeight =
+            (screenHeight * screenHeight) / listHeight
+        if (newScrollBarHeight.toInt() != scrollbarHeight.toInt()) {
+            binding.scrollbarArea.layoutParams.let {
+                scrollbarHeight = newScrollBarHeight
+                it.height = newScrollBarHeight.toInt()
+                binding.scrollbarArea.layoutParams = it
+            }
+        }
+        binding.scrollbarArea.translationY = (screenHeight * originalScrollY.toFloat()) / listHeight
     }
 
     override fun onDestroy() {
@@ -187,6 +246,7 @@ class StickyHeaderListFragment : Fragment() {
         originalScrollY = 0
         isBind = false
         isViewCreated = false
+        scrollbarOptions = null
         itemList.clear()
         binding.list.removeAllViews()
         binding.stickyArea.removeAllViews()

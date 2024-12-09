@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        getStickyHeaderFragment().bind(
+        getStickyHeaderListFragment().bind(
             // Note: Specify here a list of all the Fragments that make up the screen.
             listOf(
                 P1CellFragment.newInstance(),
@@ -38,6 +38,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getStickyHeaderFragment() =
+    private fun getStickyHeaderListFragment() =
         binding.stickyHeaderFragment.getFragment<StickyHeaderListFragment>()
 }
