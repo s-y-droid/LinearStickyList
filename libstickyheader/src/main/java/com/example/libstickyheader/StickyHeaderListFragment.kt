@@ -17,7 +17,7 @@ class StickyHeaderListFragment : Fragment() {
     private var originalScrollY: Int = 0
     private var isBind = false
     private var isViewCreated = false
-    private var bindStock: List<IStickyHeaderListCell>? = null
+    private var bindStock: List<StickyHeaderListCellFragmentBase>? = null
     private var scrollbarOptions: IScrollBarOptions? = null
     private var scrollbarHeight: Float = 0f
     private var scrollbarFadeoutRunnable: ScrollbarFadeoutRunnable? = null
@@ -34,12 +34,12 @@ class StickyHeaderListFragment : Fragment() {
     private inner class StickyItem {
         lateinit var listPartsParent: CustomFrameLayout
         var listPartsContainer: FragmentContainerView? = null
-        var listPartsView: IStickyHeaderListCell? = null
+        var listPartsView: StickyHeaderListCellFragmentBase? = null
         var stickyPartsParent: CustomFrameLayout? = null
         var stickyPartsContainer: FragmentContainerView? = null
-        var stickyPartsView: IStickyHeaderListCell? = null
+        var stickyPartsView: StickyHeaderListCellFragmentBase? = null
 
-        fun set(original: IStickyHeaderListCell): StickyItem {
+        fun set(original: StickyHeaderListCellFragmentBase): StickyItem {
             val isStickyHeader = original.isStickyHeader()
 
             if (isStickyHeader) {
@@ -62,7 +62,7 @@ class StickyHeaderListFragment : Fragment() {
                 stickyPartsParent!!.addView(stickyPartsContainer)
                 binding.stickyArea.addView(stickyPartsParent)
                 stickyPartsView = original
-                addFragmentToContainer(stickyPartsContainer!!, original.fragment())
+                addFragmentToContainer(stickyPartsContainer!!, original)
 
             } else {
                 listPartsView = original
@@ -72,7 +72,7 @@ class StickyHeaderListFragment : Fragment() {
                     CustomFrameLayout(requireContext()).also { it.setOnLayoutCallback(::moveStickyArea) }
                 listPartsParent.addView(orgContainer)
                 binding.list.addView(listPartsParent)
-                addFragmentToContainer(orgContainer, original.fragment())
+                addFragmentToContainer(orgContainer, original)
             }
             return this
         }
@@ -108,7 +108,7 @@ class StickyHeaderListFragment : Fragment() {
     class DefaultScrollbarOptions : IScrollBarOptions
 
     fun bind(
-        list: List<IStickyHeaderListCell>,
+        list: List<StickyHeaderListCellFragmentBase>,
         scrollbarOptions: IScrollBarOptions? = null,
         onCompleteBinding: ((scrollView: ScrollView) -> Unit)? = null
     ) {
@@ -195,7 +195,45 @@ class StickyHeaderListFragment : Fragment() {
                 }
             }
         }
+
+        callOnDistanceFromDisplayArea()
         moveScrollBar()
+    }
+
+    private fun callOnDistanceFromDisplayArea() {
+        val displayAreaHeight = binding.scrollview.height.toFloat()
+        fun call(fragment: StickyHeaderListCellFragmentBase, top: Float, bottom: Float) {
+            if (bottom <= 0f) {
+                fragment.onDistanceFromDisplayArea(isOnScreen = false, distancePx = -bottom)
+            } else if (top >= displayAreaHeight) {
+                fragment.onDistanceFromDisplayArea(
+                    isOnScreen = false,
+                    distancePx = top - displayAreaHeight
+                )
+            } else {
+                fragment.onDistanceFromDisplayArea(isOnScreen = true, distancePx = 0f)
+            }
+        }
+
+        itemList.forEach { item ->
+            item.stickyPartsContainer?.let {
+                (it.getFragment<StickyHeaderListCellFragmentBase>()).let { fragment ->
+                    if (fragment.isCallOnDistanceFromDisplayArea()) {
+                        val top = item.stickyPartsParent?.translationY ?: 0f
+                        val bottom = top + (item.stickyPartsParent?.height?.toFloat() ?: 0F)
+                        call(fragment, top, bottom)
+                    }
+                }
+            } ?: run {
+                (item.listPartsContainer?.getFragment<StickyHeaderListCellFragmentBase>())?.let { fragment ->
+                    if (fragment.isCallOnDistanceFromDisplayArea()) {
+                        val top = item.listPartsParent.top.toFloat() - originalScrollY
+                        val bottom = top + item.listPartsParent.height.toFloat()
+                        call(fragment, top, bottom)
+                    }
+                }
+            }
+        }
     }
 
     private fun setupScrollbar() {
