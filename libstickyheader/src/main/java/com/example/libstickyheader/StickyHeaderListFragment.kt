@@ -20,6 +20,7 @@ class StickyHeaderListFragment : Fragment() {
     private var bindStock: List<IStickyHeaderListCell>? = null
     private var scrollbarOptions: IScrollBarOptions? = null
     private var scrollbarHeight: Float = 0f
+    private var scrollbarFadeoutRunnable: ScrollbarFadeoutRunnable? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -239,10 +240,51 @@ class StickyHeaderListFragment : Fragment() {
             }
         }
         binding.scrollbarArea.translationY = (screenHeight * originalScrollY.toFloat()) / listHeight
+        showScrollbar()
     }
+
+
+    private inner class ScrollbarFadeoutRunnable : Runnable {
+        override fun run() {
+            fadeOutScrollbar()
+            scrollbarFadeoutRunnable = null
+        }
+
+        private fun fadeOutScrollbar() {
+            scrollbarOptions?.let { options ->
+                if (options.isFadeOut()) {
+                    binding.scrollbarArea.let { v ->
+                        v.alpha = 1f
+                        v.animate()
+                            .alpha(0f)
+                            .setDuration(options.isFadeOutAlphaAnimationTimeMs())
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showScrollbar() {
+        scrollbarOptions?.let { options ->
+            if (options.isFadeOut()) {
+                binding.scrollbarArea.let { v ->
+                    v.clearAnimation()
+                    v.alpha = 1f
+                    scrollbarFadeoutRunnable?.let { v.removeCallbacks(it) }
+                    scrollbarFadeoutRunnable = ScrollbarFadeoutRunnable().also {
+                        v.postDelayed(it, options.isFadeOutInactivityTimeMs())
+                    }
+                }
+            }
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
+        binding.scrollbarArea.clearAnimation()
+        scrollbarFadeoutRunnable?.let { binding.scrollbarArea.removeCallbacks(it) }
+        scrollbarFadeoutRunnable = null
         originalScrollY = 0
         isBind = false
         isViewCreated = false

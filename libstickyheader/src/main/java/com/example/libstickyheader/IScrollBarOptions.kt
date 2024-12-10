@@ -5,6 +5,6 @@ interface IScrollBarOptions {
     fun widthDp(): Float = 4.0f
     fun drawableResId(): Int = R.drawable.shape_defalut_scrollbar
     fun isFadeOut(): Boolean = true
-    fun isFadeInOutAnimationTimeMs(): Long = 200L
-    fun isFadeOutInactivityTimeMs(): Long = 2000L
+    fun isFadeOutAlphaAnimationTimeMs(): Long = 600L
+    fun isFadeOutInactivityTimeMs(): Long = 1200L
 }
