@@ -25,14 +25,7 @@ class P4CellFragment : PnCellFragmentBase() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.expandableLayout.setOnClickListener {
-            binding.expandableLayout.collapse()
-        }
-    }
-
-    fun open() {
-        binding.expandableLayout.expand()
+    fun onP3BtnClicked() {
+        binding.txt.text = "P4 cell was booted from P3 cell"
     }
 }

@@ -30,6 +30,7 @@ class P3CellFragment : PnCellFragmentBase() {
 
         binding.btn.setOnClickListener {
             setFragmentResult("P3BtnClicked")
+            binding.expandableLayout.expand()
         }
     }
 }

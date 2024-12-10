@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
             P3CellFragment.newInstance(),
             P4CellFragment.newInstance(),
             P2CellFragment.newInstance(patternNo = 1),
+            P1CellFragment.newInstance(),
             P5CellFragment.newInstance(),
         )
         getStickyHeaderListFragment().bind(cellList)
@@ -31,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         supportFragmentManager.setFragmentResultListener("P3BtnClicked", this) { _, _ ->
-            (cellList[3] as? P4CellFragment)?.open()
+            (cellList[3] as? P4CellFragment)?.onP3BtnClicked()
         }
     }
 
