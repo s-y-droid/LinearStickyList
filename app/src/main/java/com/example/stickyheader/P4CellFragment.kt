@@ -24,4 +24,15 @@ class P4CellFragment : PnCellFragmentBase() {
         binding = P4CellFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.expandableLayout.setOnClickListener {
+            binding.expandableLayout.collapse()
+        }
+    }
+
+    fun open() {
+        binding.expandableLayout.expand()
+    }
 }

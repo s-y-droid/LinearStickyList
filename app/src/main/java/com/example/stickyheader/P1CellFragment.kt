@@ -28,16 +28,13 @@ class P1CellFragment : PnCellFragmentBase() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.btn.setOnClickListener {
-            setFragmentResult("P1BtnClicked", bundleOf())
-        }
 
-        var c = 0
-        binding.btn2.setOnClickListener {
-            c++
-            binding.view.layoutParams?.let {
-                it.height = if (c % 2 == 0) 100 else 300
-                binding.view.layoutParams = it
+        listOf(
+            binding.btn1, binding.btn2, binding.btn3, binding.btn4, binding.btn5,
+            binding.btn6, binding.btn7, binding.btn8, binding.btn9, binding.btn10
+        ).forEachIndexed { idx, v ->
+            v.setOnClickListener {
+                setFragmentResult("P1BtnClicked", bundleOf("idx" to idx + 1))
             }
         }
     }

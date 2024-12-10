@@ -15,26 +15,23 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        getStickyHeaderListFragment().bind(
-            // Note: Specify here a list of all the Fragments that make up the screen.
-            listOf(
-                P1CellFragment.newInstance(),
-                P2CellFragment.newInstance(),
-                P3CellFragment.newInstance(),
-                P4CellFragment.newInstance(),
-                P1CellFragment.newInstance(),
-                P2CellFragment.newInstance(),
-                P3CellFragment.newInstance(),
-                P4CellFragment.newInstance(),
-                P1CellFragment.newInstance(),
-                P2CellFragment.newInstance(),
-                P3CellFragment.newInstance(),
-                P4CellFragment.newInstance(),
-            )
+        val cellList = listOf(
+            P1CellFragment.newInstance(),
+            P2CellFragment.newInstance(patternNo = 0),
+            P3CellFragment.newInstance(),
+            P4CellFragment.newInstance(),
+            P2CellFragment.newInstance(patternNo = 1),
+            P5CellFragment.newInstance(),
         )
+        getStickyHeaderListFragment().bind(cellList)
 
-        supportFragmentManager.setFragmentResultListener("P1BtnClicked", this) { _, _ ->
-            Toast.makeText(this, "P1BtnClicked", Toast.LENGTH_LONG).show()
+        supportFragmentManager.setFragmentResultListener("P1BtnClicked", this) { _, bundle ->
+            Toast.makeText(this, "P1BtnClicked #${bundle.getInt("idx")}", Toast.LENGTH_SHORT)
+                .show()
+        }
+
+        supportFragmentManager.setFragmentResultListener("P3BtnClicked", this) { _, _ ->
+            (cellList[3] as? P4CellFragment)?.open()
         }
     }
 
