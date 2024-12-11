@@ -59,7 +59,7 @@ publishing {
             url = uri("https://maven.pkg.github.com/s-y-droid/LinearStickyListExample")
             credentials {
                 username = "s-y-droid"
-                password = System.getenv("PAT")
+                password = (project.findProperty("gpr.token") as? String) ?: System.getenv("PAT")
             }
         }
     }
