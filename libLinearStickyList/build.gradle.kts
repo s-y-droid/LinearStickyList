@@ -4,7 +4,7 @@ plugins {
     id("maven-publish")
 }
 
-val lib_version = "1.0.0"
+val lib_version = "1.0.1"
 
 android {
     namespace = "com.sydroid.android.linearstickylist"
