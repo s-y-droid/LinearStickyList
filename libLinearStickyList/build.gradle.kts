@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.libstickyheader"
+    namespace = "com.sydroid.android.linearstickylist"
     compileSdk = 35
 
     defaultConfig {

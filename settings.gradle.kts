@@ -20,6 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "stickyheader"
+rootProject.name = "LinearStickyList Example"
 include(":app")
-include(":libstickyheader")
+include(":libLinearStickyList")

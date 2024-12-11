@@ -1,4 +1,4 @@
-package com.example.libstickyheader.impl
+package com.sydroid.android.linearstickylist.impl
 
 import android.content.Context
 import android.util.AttributeSet

@@ -28,9 +28,7 @@
     <net.cachapa.expandablelayout.ExpandableLayout
         android:id="@+id/expandableLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true">
+        android:layout_height="wrap_content">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

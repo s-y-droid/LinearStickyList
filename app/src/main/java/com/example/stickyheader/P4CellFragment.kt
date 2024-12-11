@@ -26,6 +26,7 @@ class P4CellFragment : PnCellFragmentBase() {
     }
 
     fun onP3BtnClicked() {
-        binding.txt.text = "P4 cell was booted from P3 cell"
+        binding.txt.text = "Cell P4 was displayed due to an event in cell P3"
+        binding.expandableLayout.expand()
     }
 }

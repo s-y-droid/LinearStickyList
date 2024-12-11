@@ -3,7 +3,7 @@ package com.example.stickyheader
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.libstickyheader.StickyHeaderListFragment
+import com.sydroid.android.linearstickylist.LinearStickyListFragment
 import com.example.stickyheader.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -24,18 +24,20 @@ class MainActivity : AppCompatActivity() {
             P1CellFragment.newInstance(),
             P5CellFragment.newInstance(),
         )
-        getStickyHeaderListFragment().bind(cellList)
+        getLinearStickyListFragment().bind(cellList)
 
         supportFragmentManager.setFragmentResultListener("P1BtnClicked", this) { _, bundle ->
-            Toast.makeText(this, "P1BtnClicked #${bundle.getInt("idx")}", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "P1BtnClicked. #${bundle.getInt("idx")}", Toast.LENGTH_SHORT)
                 .show()
         }
 
         supportFragmentManager.setFragmentResultListener("P3BtnClicked", this) { _, _ ->
+            Toast.makeText(this, "P3BtnClicked. Sends an event to the P4 cell.", Toast.LENGTH_SHORT)
+                .show()
             (cellList[3] as? P4CellFragment)?.onP3BtnClicked()
         }
     }
 
-    private fun getStickyHeaderListFragment() =
-        binding.stickyHeaderFragment.getFragment<StickyHeaderListFragment>()
+    private fun getLinearStickyListFragment() =
+        binding.stickyHeaderFragment.getFragment<LinearStickyListFragment>()
 }
