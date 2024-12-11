@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id("maven-publish")
 }
+
+val lib_version = "1.0.0"
 
 android {
     namespace = "com.sydroid.android.linearstickylist"
@@ -37,4 +40,27 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            afterEvaluate {
+                from(components["release"])
+            }
+            groupId = "com.sydroid.android"
+            artifactId = "linearstickylist"
+            version = lib_version
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/s-y-droid/LinearStickyListExample")
+            credentials {
+                username = "s-y-droid"
+                password = System.getenv("PAT")
+            }
+        }
+    }
 }

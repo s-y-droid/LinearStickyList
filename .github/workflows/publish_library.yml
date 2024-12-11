@@ -1,0 +1,15 @@
+name: "Publish library to GitHub Packages"
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Publish library
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: ./gradlew assembleRelease publish
