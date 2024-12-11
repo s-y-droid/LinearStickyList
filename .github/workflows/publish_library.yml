@@ -17,9 +17,8 @@ jobs:
           java-version: '17'
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: clean
-        run: ./gradlew clean
       - name: Publish library
         env:
-          PAT: ${{ secrets.PAT }}
+          USER: ${{ secrets.USER }}
+          TOKEN: ${{ secrets.TOKEN }}
         run: ./gradlew assembleRelease publish
