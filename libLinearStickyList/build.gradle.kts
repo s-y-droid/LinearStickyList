@@ -57,6 +57,7 @@ publishing {
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/s-y-droid/LinearStickyListExample")
+            println("DBG user:${System.getenv("USER")}")
             credentials {
                 username = (project.findProperty("gpr.user") as? String) ?: System.getenv("USER")
                 password = (project.findProperty("gpr.token") as? String) ?: System.getenv("TOKEN")
