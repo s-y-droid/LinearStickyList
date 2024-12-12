@@ -56,7 +56,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/s-y-droid/LinearStickyListExample")
+            url = uri("https://maven.pkg.github.com/s-y-droid/LinearStickyList")
             credentials {
                 username = (project.findProperty("gpr.user") as? String) ?: System.getenv("USER")
                 password = (project.findProperty("gpr.token") as? String) ?: System.getenv("TOKEN")
