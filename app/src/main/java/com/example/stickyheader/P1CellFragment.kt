@@ -6,8 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import com.example.stickyheader.databinding.P1CellFragmentBinding
+import com.sydroid.android.linearstickylist.LinearStickyListCellFragmentBase
 
-class P1CellFragment : PnCellFragmentBase() {
+class P1CellFragment : LinearStickyListCellFragmentBase() {
 
     companion object {
         fun newInstance() = P1CellFragment()

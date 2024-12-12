@@ -8,8 +8,9 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import com.example.stickyheader.databinding.P2CellFragmentBinding
+import com.sydroid.android.linearstickylist.LinearStickyListCellFragmentBase
 
-class P2CellFragment : PnCellFragmentBase() {
+class P2CellFragment : LinearStickyListCellFragmentBase() {
 
     companion object {
         fun newInstance(patternNo: Int = 0) = P2CellFragment().apply {

@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ScrollView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import com.sydroid.android.linearstickylist.databinding.LinearStickyListFragmentBinding
@@ -18,18 +18,10 @@ class LinearStickyListFragment : Fragment() {
     private var isBind = false
     private var isViewCreated = false
     private var bindStock: List<LinearStickyListCellFragmentBase>? = null
-    private var scrollbarOptions: IScrollBarOptions? = null
+    private var scrollbarOptions: LinearStickyListScrollbarOptions? = null
     private var scrollbarHeight: Float = 0f
     private var scrollbarFadeoutRunnable: ScrollbarFadeoutRunnable? = null
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = LinearStickyListFragmentBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    private var currentTopNormalCellIdx: Int? = null
 
     private inner class StickyItem {
         lateinit var listPartsParent: CustomFrameLayout
@@ -39,14 +31,11 @@ class LinearStickyListFragment : Fragment() {
         var stickyPartsContainer: FragmentContainerView? = null
         var stickyPartsView: LinearStickyListCellFragmentBase? = null
 
-        fun set(original: LinearStickyListCellFragmentBase): StickyItem {
+        fun set(original: LinearStickyListCellFragmentBase, idx: Int): StickyItem {
             val isStickyHeader = original.isStickyHeader()
 
             if (isStickyHeader) {
-                listPartsParent =
-                    CustomFrameLayout(requireContext()).also {
-                        it.setOnLayoutCallback(::moveStickyArea)
-                    }
+                listPartsParent = CustomFrameLayout(requireContext())
                 binding.list.addView(listPartsParent)
 
                 stickyPartsParent =
@@ -62,7 +51,7 @@ class LinearStickyListFragment : Fragment() {
                 stickyPartsParent!!.addView(stickyPartsContainer)
                 binding.stickyArea.addView(stickyPartsParent)
                 stickyPartsView = original
-                addFragmentToContainer(stickyPartsContainer!!, original)
+                addFragmentToContainer(stickyPartsContainer!!, original, idx)
 
             } else {
                 listPartsView = original
@@ -72,7 +61,7 @@ class LinearStickyListFragment : Fragment() {
                     CustomFrameLayout(requireContext()).also { it.setOnLayoutCallback(::moveStickyArea) }
                 listPartsParent.addView(orgContainer)
                 binding.list.addView(listPartsParent)
-                addFragmentToContainer(orgContainer, original)
+                addFragmentToContainer(orgContainer, original, idx)
             }
             return this
         }
@@ -89,35 +78,101 @@ class LinearStickyListFragment : Fragment() {
             return container
         }
 
-        private fun addFragmentToContainer(container: FragmentContainerView, fragment: Fragment) {
+        private fun addFragmentToContainer(
+            container: FragmentContainerView,
+            fragment: LinearStickyListCellFragmentBase,
+            idx: Int
+        ) {
+            fragment.arguments?.putInt("StickyHeaderList_Idx", idx) ?: run {
+                fragment.arguments = bundleOf("StickyHeaderList_Idx" to idx)
+            }
+            childFragmentManager.beginTransaction().remove(fragment).commit()
+            childFragmentManager.executePendingTransactions()
             val transaction = childFragmentManager.beginTransaction()
             transaction.replace(container.id, fragment)
             transaction.commit()
         }
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = LinearStickyListFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        isViewCreated = true
-        bindStock?.let {
-            bind(it)
-            bindStock = null
+        savedInstanceState?.let {
+            restore(it)
+        } ?: run {
+            isViewCreated = true
+            bindStock?.let {
+                setup(it)
+                bindStock = null
+            }
         }
     }
 
-    private class DefaultScrollbarOptions : IScrollBarOptions
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("isBind", isBind)
+        outState.putBoolean("isViewCreated", isViewCreated)
+        (scrollbarOptions ?: LinearStickyListScrollbarOptions()).let {
+            outState.putBoolean("scrollbarIsShow", it.isShowScrollbar)
+            outState.putFloat("scrollbarWidthDp", it.widthDp)
+            outState.putInt("scrollbarResId", it.drawableResId)
+            outState.putBoolean("scrollbarIsFadeOut", it.isFadeOut)
+            outState.putLong("scrollbarFadeOutAnimTime", it.isFadeOutAlphaAnimationTimeMs)
+            outState.putLong("scrollbarFadeOutInactivityTime", it.isFadeOutInactivityTimeMs)
+        }
+        currentTopNormalCellIdx?.let { outState.putInt("currentTopNormalCellIdx", it) }
+    }
 
-    fun bind(
+    private fun restore(savedInstanceState: Bundle?) {
+        isBind = savedInstanceState?.getBoolean("isBind") ?: false
+        isViewCreated = savedInstanceState?.getBoolean("isViewCreated") ?: false
+        scrollbarOptions = savedInstanceState?.let {
+            LinearStickyListScrollbarOptions(
+                isShowScrollbar = it.getBoolean("scrollbarIsShow"),
+                widthDp = it.getFloat("scrollbarWidthDp"),
+                drawableResId = it.getInt("scrollbarResId"),
+                isFadeOut = it.getBoolean("scrollbarIsFadeOut"),
+                isFadeOutAlphaAnimationTimeMs = it.getLong("scrollbarFadeOutAnimTime"),
+                isFadeOutInactivityTimeMs = it.getLong("scrollbarFadeOutInactivityTime"),
+            )
+        } ?: LinearStickyListScrollbarOptions()
+        currentTopNormalCellIdx = savedInstanceState?.getInt("currentTopNormalCellIdx")
+
+        setup(
+            restoredCells.toList().sortedBy { it.first }.map { it.second },
+            scrollbarOptions
+        )
+        restoredCells.clear()
+
+        currentTopNormalCellIdx?.let {
+            val restoredTransY: Int = itemList[it].listPartsParent.top
+            binding.scrollview.scrollTo(0, restoredTransY)
+        }
+    }
+
+    private val restoredCells = mutableMapOf<Int, LinearStickyListCellFragmentBase>()
+    fun cellFragmentIsRestored(cell: LinearStickyListCellFragmentBase, idx: Int) {
+        restoredCells[idx] = cell
+    }
+
+    fun setup(
         list: List<LinearStickyListCellFragmentBase>,
-        scrollbarOptions: IScrollBarOptions? = null,
-        onCompleteBinding: ((scrollView: ScrollView) -> Unit)? = null
+        scrollbarOptions: LinearStickyListScrollbarOptions? = null
     ) {
-        this.scrollbarOptions = scrollbarOptions ?: DefaultScrollbarOptions()
+        this.scrollbarOptions = scrollbarOptions ?: LinearStickyListScrollbarOptions()
 
         if (isViewCreated) {
             itemList.clear()
-            list.forEach { stickyHeaderItem ->
-                itemList.add(StickyItem().set(stickyHeaderItem))
+            list.forEachIndexed { idx, stickyHeaderItem ->
+                itemList.add(StickyItem().set(stickyHeaderItem, idx))
             }
             binding.scrollview.setScrollChangedCallback { y ->
                 originalScrollY = y
@@ -128,7 +183,6 @@ class LinearStickyListFragment : Fragment() {
                 isBind = true
                 setupScrollbar()
                 moveStickyArea()
-                onCompleteBinding?.invoke(binding.scrollview)
             }
         } else {
             bindStock = list
@@ -202,7 +256,15 @@ class LinearStickyListFragment : Fragment() {
 
     private fun callOnDistanceFromDisplayArea() {
         val displayAreaHeight = binding.scrollview.height.toFloat()
-        fun call(fragment: LinearStickyListCellFragmentBase, top: Float, bottom: Float) {
+        var currentTopNormalCellIdx: Int? = null
+
+        fun call(
+            fragment: LinearStickyListCellFragmentBase,
+            top: Float,
+            bottom: Float,
+            isSticky: Boolean,
+            idx: Int
+        ) {
             if (bottom <= 0f) {
                 fragment.onDistanceFromDisplayArea(isOnScreen = false, distancePx = -bottom)
             } else if (top >= displayAreaHeight) {
@@ -211,29 +273,28 @@ class LinearStickyListFragment : Fragment() {
                     distancePx = top - displayAreaHeight
                 )
             } else {
+                if (!isSticky && currentTopNormalCellIdx == null) currentTopNormalCellIdx = idx
                 fragment.onDistanceFromDisplayArea(isOnScreen = true, distancePx = 0f)
             }
         }
 
-        itemList.forEach { item ->
+        itemList.forEachIndexed { idx, item ->
             item.stickyPartsContainer?.let {
                 (it.getFragment<LinearStickyListCellFragmentBase>()).let { fragment ->
-                    if (fragment.isCallOnDistanceFromDisplayArea()) {
-                        val top = item.stickyPartsParent?.translationY ?: 0f
-                        val bottom = top + (item.stickyPartsParent?.height?.toFloat() ?: 0F)
-                        call(fragment, top, bottom)
-                    }
+                    val top = item.stickyPartsParent?.translationY ?: 0f
+                    val bottom = top + (item.stickyPartsParent?.height?.toFloat() ?: 0F)
+                    call(fragment, top, bottom, true, idx)
                 }
             } ?: run {
                 (item.listPartsContainer?.getFragment<LinearStickyListCellFragmentBase>())?.let { fragment ->
-                    if (fragment.isCallOnDistanceFromDisplayArea()) {
-                        val top = item.listPartsParent.top.toFloat() - originalScrollY
-                        val bottom = top + item.listPartsParent.height.toFloat()
-                        call(fragment, top, bottom)
-                    }
+                    val top = item.listPartsParent.top.toFloat() - originalScrollY
+                    val bottom = top + item.listPartsParent.height.toFloat()
+                    call(fragment, top, bottom, false, idx)
                 }
             }
         }
+
+        this.currentTopNormalCellIdx = currentTopNormalCellIdx
     }
 
     private fun setupScrollbar() {
@@ -241,7 +302,7 @@ class LinearStickyListFragment : Fragment() {
         val screenHeight = binding.stickyArea.height.toFloat()
 
         scrollbarOptions?.let { options ->
-            if (!options.isShowScrollbar() || listHeight <= screenHeight) {
+            if (!options.isShowScrollbar || listHeight <= screenHeight) {
                 binding.scrollbarArea.visibility = View.GONE
 
             } else {
@@ -249,9 +310,9 @@ class LinearStickyListFragment : Fragment() {
                     (requireContext().resources.displayMetrics.density * dp).toInt()
 
                 binding.scrollbarArea.let { sbArea ->
-                    sbArea.setBackgroundResource(scrollbarOptions!!.drawableResId())
+                    sbArea.setBackgroundResource(scrollbarOptions!!.drawableResId)
                     sbArea.layoutParams.let {
-                        it.width = dpToPx(options.widthDp())
+                        it.width = dpToPx(options.widthDp)
                         scrollbarHeight =
                             (screenHeight * screenHeight) / listHeight
                         it.height = scrollbarHeight.toInt()
@@ -290,12 +351,12 @@ class LinearStickyListFragment : Fragment() {
 
         private fun fadeOutScrollbar() {
             scrollbarOptions?.let { options ->
-                if (options.isFadeOut()) {
+                if (options.isFadeOut) {
                     binding.scrollbarArea.let { v ->
                         v.alpha = 1f
                         v.animate()
                             .alpha(0f)
-                            .setDuration(options.isFadeOutAlphaAnimationTimeMs())
+                            .setDuration(options.isFadeOutAlphaAnimationTimeMs)
                     }
                 }
             }
@@ -304,31 +365,37 @@ class LinearStickyListFragment : Fragment() {
 
     private fun showScrollbar() {
         scrollbarOptions?.let { options ->
-            if (options.isFadeOut()) {
+            if (options.isFadeOut) {
                 binding.scrollbarArea.let { v ->
                     v.clearAnimation()
                     v.alpha = 1f
                     scrollbarFadeoutRunnable?.let { v.removeCallbacks(it) }
                     scrollbarFadeoutRunnable = ScrollbarFadeoutRunnable().also {
-                        v.postDelayed(it, options.isFadeOutInactivityTimeMs())
+                        v.postDelayed(it, options.isFadeOutInactivityTimeMs)
                     }
                 }
             }
         }
     }
 
+    fun getFragmentByIdx(idx: Int): LinearStickyListCellFragmentBase =
+        if (0 <= idx && idx < itemList.size) {
+            itemList[idx].let {
+                if (it.isStickyHeader()) {
+                    it.stickyPartsContainer?.getFragment<LinearStickyListCellFragmentBase>()
+                        ?: throw (Exception("getFragmentByIdx($idx) Sticky cell not found."))
+                } else {
+                    it.listPartsContainer?.getFragment<LinearStickyListCellFragmentBase>()
+                        ?: throw (Exception("getFragmentByIdx($idx) Normal cell not found."))
+                }
+            }
+        } else throw (Exception("getFragmentByIdx($idx) is out of range /itemSize:${itemList.size}"))
 
     override fun onDestroy() {
-        super.onDestroy()
         binding.scrollbarArea.clearAnimation()
         scrollbarFadeoutRunnable?.let { binding.scrollbarArea.removeCallbacks(it) }
         scrollbarFadeoutRunnable = null
         originalScrollY = 0
-        isBind = false
-        isViewCreated = false
-        scrollbarOptions = null
-        itemList.clear()
-        binding.list.removeAllViews()
-        binding.stickyArea.removeAllViews()
+        super.onDestroy()
     }
 }
