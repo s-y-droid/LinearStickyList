@@ -8,6 +8,8 @@ It is best suited for UI requirements where the number of elements in the list i
 ![a](https://github.com/user-attachments/assets/1f3a52bf-3e7a-427e-a4a0-bd1ae1d831d1)
 
 # Integration
+※ This project uses AGP8.9. Please build with the latest Android Studio.
+
 Add the following to the build.gradle file in the project root:
 ```
 repositories {
