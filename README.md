@@ -91,10 +91,10 @@ class P1CellFragment : LinearStickyListCellFragmentBase() {
     }
 }
 ```
-This method is called back from LinearStickyListCellFragment.
+This method is called back from LinearStickyListFragment.
 ```
 isOnScreen : Whether the cell is visible on screen or not
-distancePx :　If isOnScreen is false, the distance away from the screen (unit: Px)
+distancePx :If isOnScreen is false, the distance away from the screen (unit: Px)
 ```
 A callback will be made to tell you how far it is from the screen.
 Its purpose is to stop the animation of off-screen Cell or to free memory, etc.
