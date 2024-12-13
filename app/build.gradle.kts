@@ -53,5 +53,5 @@ dependencies {
     // local build
     implementation(project(":libLinearStickyList"))
     // import from JitPack
-    //implementation("com.github.s-y-droid:LinearStickyList:v1.0.1")
+    //implementation("com.github.s-y-droid:LinearStickyList:v1.0.2")
 }
