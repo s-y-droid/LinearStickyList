@@ -50,8 +50,19 @@ Override isStickyHeader(). If you want to make the cell a StickyHeader, set it t
 
 For more details, search the source code for "Note #".
 
+[Note #1 About setup of LinearStickyListCellFragment](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L36)
+
+[Note #2 How can a parent safely obtain an instance of a Cell fragment?](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L101)
+
+[Note #3 About Cell Fragment implementation](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L27)
+
+[Note #4 How to emit an event from a Cell Fragment to its parent](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L70)
+
+[Note #5 Customizing the scrollbar](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L53)
+
 # Customization
 
+## Scrollbar
 When calling the setup() method of the LinearStickyListFragment, you can specify scrollbar options.
 ```kotlin
 data class LinearStickyListScrollbarOptions(
@@ -64,5 +75,27 @@ data class LinearStickyListScrollbarOptions(
 )
 ```
 If you do not specify any options, a design and functionality similar to ScrollView will be displayed.
+For details on parameters, see ["Note #5"](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L53) in the source code.
 
-For details on parameters, see "Note #5" in the source code.
+## Triggers when a Cell enters or leaves the screen.
+
+LinearStickyListCellFragmentBase has an onDistanceFromDisplayArea() method that can be optionally overridden.
+```kotlin
+class P1CellFragment : LinearStickyListCellFragmentBase() {
+
+    override fun onDistanceFromDisplayArea(
+        isOnScreen: Boolean,
+        distancePx: Float
+    ) {
+        // Implementing trigger detection to free memory and stop/resume animation
+    }
+}
+```
+This method is called back from LinearStickyListCellFragment.
+```
+isOnScreen : Whether the cell is visible on screen or not
+distancePx :　If isOnScreen is false, the distance away from the screen (unit: Px)
+```
+A callback will be made to tell you how far it is from the screen.
+Its purpose is to stop the animation of off-screen Cell or to free memory, etc.
+Please override if you need it.
