@@ -54,11 +54,11 @@ class MainActivity : AppCompatActivity() {
                 //     ... Only valid when isShowScrollbar=true.
                 //         Whether to hide the scrollbars if no scrolling occurs for a while.
                 //
-                // val isFadeOutAlphaAnimationTimeMs : Long = 600L,
+                // val fadeOutAlphaAnimationTimeMs : Long = 600L,
                 //     ... Only valid when isFadeOut=true.
                 //         Time for the scrollbar to fade out (Unit: ms)
                 //
-                // val isFadeOutInactivityTimeMs : Long = 1200L
+                // val fadeOutInactivityTimeMs : Long = 1200L
                 //     ... Only valid when isFadeOut=true.
                 //         The amount of inactivity time required for the scrollbar to fade out. (Unit: ms)
                 scrollbarOptions = LinearStickyListScrollbarOptions()

@@ -125,8 +125,8 @@ class LinearStickyListFragment : Fragment() {
             outState.putFloat("scrollbarWidthDp", it.widthDp)
             outState.putInt("scrollbarResId", it.drawableResId)
             outState.putBoolean("scrollbarIsFadeOut", it.isFadeOut)
-            outState.putLong("scrollbarFadeOutAnimTime", it.isFadeOutAlphaAnimationTimeMs)
-            outState.putLong("scrollbarFadeOutInactivityTime", it.isFadeOutInactivityTimeMs)
+            outState.putLong("scrollbarFadeOutAnimTime", it.fadeOutAlphaAnimationTimeMs)
+            outState.putLong("scrollbarFadeOutInactivityTime", it.fadeOutInactivityTimeMs)
         }
         currentTopNormalCellIdx?.let { outState.putInt("currentTopNormalCellIdx", it) }
     }
@@ -140,8 +140,8 @@ class LinearStickyListFragment : Fragment() {
                 widthDp = it.getFloat("scrollbarWidthDp"),
                 drawableResId = it.getInt("scrollbarResId"),
                 isFadeOut = it.getBoolean("scrollbarIsFadeOut"),
-                isFadeOutAlphaAnimationTimeMs = it.getLong("scrollbarFadeOutAnimTime"),
-                isFadeOutInactivityTimeMs = it.getLong("scrollbarFadeOutInactivityTime"),
+                fadeOutAlphaAnimationTimeMs = it.getLong("scrollbarFadeOutAnimTime"),
+                fadeOutInactivityTimeMs = it.getLong("scrollbarFadeOutInactivityTime"),
             )
         } ?: LinearStickyListScrollbarOptions()
         currentTopNormalCellIdx = savedInstanceState?.getInt("currentTopNormalCellIdx")
@@ -356,7 +356,7 @@ class LinearStickyListFragment : Fragment() {
                         v.alpha = 1f
                         v.animate()
                             .alpha(0f)
-                            .setDuration(options.isFadeOutAlphaAnimationTimeMs)
+                            .setDuration(options.fadeOutAlphaAnimationTimeMs)
                     }
                 }
             }
@@ -371,7 +371,7 @@ class LinearStickyListFragment : Fragment() {
                     v.alpha = 1f
                     scrollbarFadeoutRunnable?.let { v.removeCallbacks(it) }
                     scrollbarFadeoutRunnable = ScrollbarFadeoutRunnable().also {
-                        v.postDelayed(it, options.isFadeOutInactivityTimeMs)
+                        v.postDelayed(it, options.fadeOutInactivityTimeMs)
                     }
                 }
             }
