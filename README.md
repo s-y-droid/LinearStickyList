@@ -50,13 +50,13 @@ Override isStickyHeader(). If you want to make the cell a StickyHeader, set it t
 
 For more details, search the source code for "Note #".
 
-[Note #1 About setup of LinearStickyListCellFragment](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L36)
+[Note #1 About setup of LinearStickyListFragment](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L36)
 
 [Note #2 How can a parent safely obtain an instance of a Cell fragment?](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L101)
 
-[Note #3 About Cell Fragment implementation](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L27)
+[Note #3 About Cell fragment implementation](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L27)
 
-[Note #4 How to emit an event from a Cell Fragment to its parent](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L70)
+[Note #4 How to emit an event from a Cell fragment to its parent](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L70)
 
 [Note #5 Customizing the scrollbar](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L53)
 
