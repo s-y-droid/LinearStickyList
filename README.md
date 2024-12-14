@@ -101,3 +101,9 @@ distancePx : If isOnScreen is false, the distance away from the screen (unit: Px
 A callback will be made to tell you how far it is from the screen.
 Its purpose is to stop the animation of off-screen Cell or to free memory, etc.
 Please override if you need it.
+
+# Finally
+I hope this library will help you reduce your development time even a little.
+We welcome your comments and impressions. If you have any ideas to improve the product, please join us as a contributor.
+
+Have a good development life!
