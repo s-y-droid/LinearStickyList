@@ -3,7 +3,7 @@
 
 LinearStickyList is a simple StickyHeader UI component based on ScrollView and LinearLayout.
 It scrolls quickly because there is no rebinding that causes lag when scrolling from off-screen to on-screen, as with RecyclerView.
-It is best suited for UI requirements where the number of elements in the list is small(at most 20) and many Views must be placed in each element.
+It is best suited for UI requirements where the number of elements in the list is small(at most about 20) and many Views must be placed in each element.
 
 ![a](https://github.com/user-attachments/assets/1f3a52bf-3e7a-427e-a4a0-bd1ae1d831d1)
 
@@ -52,15 +52,15 @@ Override isStickyHeader(). If you want to make the cell a StickyHeader, set it t
 
 For more details, search the source code for "Note #".
 
-[Note #1 About setup of LinearStickyListFragment](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L36)
+[Note #1 About setup of LinearStickyListFragment](https://github.com/s-y-droid/LinearStickyList/blob/develop/app/src/main/java/com/example/stickyheader/MainActivity.kt#L36)
 
-[Note #2 How can a parent safely obtain an instance of a Cell fragment?](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L101)
+[Note #2 How can a parent safely obtain an instance of a Cell fragment?](https://github.com/s-y-droid/LinearStickyList/blob/develop/app/src/main/java/com/example/stickyheader/MainActivity.kt#L101)
 
-[Note #3 About Cell fragment implementation](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L27)
+[Note #3 About Cell fragment implementation](https://github.com/s-y-droid/LinearStickyList/blob/develop/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L27)
 
-[Note #4 How to emit an event from a Cell fragment to its parent](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L70)
+[Note #4 How to emit an event from a Cell fragment to its parent](https://github.com/s-y-droid/LinearStickyList/blob/develop/app/src/main/java/com/example/stickyheader/P1CellFragment.kt#L70)
 
-[Note #5 Customizing the scrollbar](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L53)
+[Note #5 Customizing the scrollbar](https://github.com/s-y-droid/LinearStickyList/blob/develop/app/src/main/java/com/example/stickyheader/MainActivity.kt#L53)
 
 # Customization
 
@@ -77,7 +77,7 @@ data class LinearStickyListScrollbarOptions(
 )
 ```
 If you do not specify any options, a design and functionality similar to ScrollView will be displayed.
-For details on parameters, see ["Note #5"](https://github.com/s-y-droid/LinearStickyList/blob/master/app/src/main/java/com/example/stickyheader/MainActivity.kt#L53) in the source code.
+For details on parameters, see ["Note #5"](https://github.com/s-y-droid/LinearStickyList/blob/develop/app/src/main/java/com/example/stickyheader/MainActivity.kt#L53) in the source code.
 
 ## Triggers when a Cell enters or leaves the screen.
 
@@ -96,7 +96,7 @@ class P1CellFragment : LinearStickyListCellFragmentBase() {
 This method is called back from LinearStickyListFragment.
 ```
 isOnScreen : Whether the cell is visible on screen or not
-distancePx :If isOnScreen is false, the distance away from the screen (unit: Px)
+distancePx : If isOnScreen is false, the distance away from the screen (unit: Px)
 ```
 A callback will be made to tell you how far it is from the screen.
 Its purpose is to stop the animation of off-screen Cell or to free memory, etc.
