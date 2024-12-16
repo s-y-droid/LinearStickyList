@@ -8,7 +8,9 @@ It is best suited for UI requirements where the number of elements in the list i
 ![a](https://github.com/user-attachments/assets/1f3a52bf-3e7a-427e-a4a0-bd1ae1d831d1)
 
 # Integration
-<b>This project uses AGP8.7.3(Gradle 8.9). Please build with the latest Android Studio.</b>
+<b>・This project uses AGP8.7.3(Gradle 8.9). Please build with the latest Android Studio.</b>
+
+<b>・If you are using build.gradle.kts, please introduce it to your app as described [here](https://jitpack.io/#s-y-droid/LinearStickyList).</b>
 
 Add the following to the build.gradle file in the project root:
 ```
