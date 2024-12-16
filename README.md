@@ -10,7 +10,7 @@ It is best suited for UI requirements where the number of elements in the list i
 # Integration
 <b>・This project uses AGP8.7.3(Gradle 8.9). Please build with the latest Android Studio.</b>
 
-<b>・If you are using build.gradle.kts, please introduce it to your app as described [here](https://jitpack.io/#s-y-droid/LinearStickyList).</b>
+<b>・If your app uses the latest Android development environment, please install it as described [here](https://jitpack.io/#s-y-droid/LinearStickyList).</b>
 
 Add the following to the build.gradle file in the project root:
 ```
